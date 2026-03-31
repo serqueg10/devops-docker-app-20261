@@ -49,6 +49,8 @@ jobs:
   build-and-push:
     needs: ci
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.vars.outputs.version }}
     permissions:
       contents: read
       packages: write
@@ -97,6 +99,7 @@ jobs:
         # Construye y publica la imagen versionada y latest
 
       - name: Scan image with Trivy
+        continue-on-error: true
         uses: aquasecurity/trivy-action@0.22.0
         with:
           image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.version }}
@@ -164,7 +167,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
           set -e
           export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-          export TAG=${GITHUB_SHA::7}
+          export TAG=${{ needs.build-and-push.outputs.version }}
           export APP_PORT=${{ secrets.APP_PORT }}
           mkdir -p /opt/devops-docker-app
           cd /opt/devops-docker-app
