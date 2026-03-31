@@ -111,7 +111,7 @@ jobs:
   
 
   deploy:
-    needs: build-and-push
+    needs: build_and_push
     runs-on: ubuntu-latest
     steps:
       # Gate: ¿hay secrets?
@@ -167,7 +167,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
           set -e
           export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-          export TAG=${{ needs.['build-and-push'].outputs.version }}
+          export TAG=${{ needs.build_and_push.outputs.version }}
           export APP_PORT=${{ secrets.APP_PORT }}
           mkdir -p /opt/devops-docker-app
           cd /opt/devops-docker-app
